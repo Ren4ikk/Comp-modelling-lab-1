@@ -5,27 +5,6 @@ import os
 import tsplib95
 
 
-def load_solutions(solutions_path: str) -> dict:
-    """Читает файл solutions (формат 'name : value') -> {name: optimum}."""
-    if not os.path.exists(solutions_path):
-        raise FileNotFoundError(f"Файл solutions не найден: '{solutions_path}'")
-
-    solutions = {}
-    with open(solutions_path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or ":" not in line:
-                continue
-            name, _, raw_value = line.partition(":")
-            value_str = raw_value.split("(")[0].strip()
-            try:
-                solutions[name.strip()] = int(value_str)
-            except ValueError:
-                pass
-
-    return solutions
-
-
 def load_tsp_file(tsp_dir: str, name: str):
     """Загружает .tsp файл из папки tsp_dir по имени инстанса."""
     path = os.path.join(tsp_dir, f"{name}.tsp")
@@ -155,17 +134,13 @@ if __name__ == "__main__":
         "brazil58",
     ]
 
-    solutions = load_solutions(SOLUTIONS_FILE)
     results   = {}
 
     for name in INSTANCE_NAMES:
         problem = load_tsp_file(TSP_DIR, name)
-        optimum = solutions.get(name)
 
         print(f"\n{'='*55}")
         print(f"  Инстанс : {name}   (городов: {problem.dimension})")
-        # if optimum is not None:
-        #     print(f"  Оптимум : {optimum}")
         print(f"{'='*55}")
 
         dist, n = build_distance_matrix(problem)
@@ -175,9 +150,6 @@ if __name__ == "__main__":
         elapsed = time.time() - t0
 
         print(f"\n  >>> Лучшая длина тура : {best_length:.1f}")
-        # if optimum is not None:
-        #     gap = (best_length - optimum) / optimum * 100
-        #     print(f"  >>> Отклонение от опт.: {gap:.2f}%")
         print(f"  >>> Время работы      : {elapsed:.2f} сек")
         print(f"  >>> Маршрут (города)  : {[c + 1 for c in best_tour]}")
 
